@@ -1,71 +1,148 @@
-# MNIST Handwritten Digit Recognition API
+# MNIST AI - Handwritten Digit Recognition System
 
-A production-ready Deep Learning REST API that classifies handwritten digits (0–9) from 28×28 grayscale images using a Convolutional Neural Network (CNN) built with **TensorFlow / Keras 3** on **Python 3.13**, served via **Flask** and **Gunicorn**, and configured for zero-downtime deployment on **Render**.
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.21.0-FF6F00?logo=tensorflow&logoColor=white)](https://www.tensorflow.org/)
+[![Keras](https://img.shields.io/badge/Keras-3.14.1-D00000?logo=keras&logoColor=white)](https://keras.io/)
+[![Flask](https://img.shields.io/badge/Flask-3.1.2-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Python](https://img.shields.io/badge/Python-3.13.4-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Accuracy](https://img.shields.io/badge/Test_Accuracy-98.97%25-10B981)](#cnn-architecture--performance)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+An interactive, production-ready Deep Learning web platform that classifies handwritten digits (0–9) in real time using a Convolutional Neural Network (CNN) built with **TensorFlow / Keras 3**. Features a modern **HTML5 / CSS3 / JavaScript** AI dashboard with an interactive touch/mouse canvas, smart MNIST preprocessing, live confidence and 10-class probability visualization, and a RESTful **Flask** backend deployed with **Gunicorn** on **Render**.
 
 ---
 
 ## Table of Contents
-1. [Project Overview](#project-overview)
+1. [Key Features](#key-features)
 2. [Technology Stack](#technology-stack)
-3. [CNN Architecture & Performance](#cnn-architecture--performance)
-4. [Project Structure](#project-structure)
-5. [Local Installation & Setup](#local-installation--setup)
-6. [Running the Application Locally](#running-the-application-locally)
-7. [API Endpoints & Specifications](#api-endpoints--specifications)
-8. [Automated API Testing](#automated-api-testing)
-9. [GitHub Configuration & Upload Instructions](#github-configuration--upload-instructions)
-10. [Render Cloud Deployment Guide](#render-cloud-deployment-guide)
+3. [Interactive Frontend Highlights](#interactive-frontend-highlights)
+4. [Smart Image Preprocessing Pipeline](#smart-image-preprocessing-pipeline)
+5. [CNN Architecture & Specifications](#cnn-architecture--specifications)
+6. [Project Structure](#project-structure)
+7. [Local Installation & Setup](#local-installation--setup)
+8. [Running Locally](#running-locally)
+9. [Automated Testing Suite](#automated-testing-suite)
+10. [REST API Documentation](#rest-api-documentation)
+11. [Render Cloud Deployment Guide](#render-cloud-deployment-guide)
+12. [Git Version Control & Repository](#git-version-control--repository)
 
 ---
 
-## Project Overview
+## Key Features
 
-This project provides an end-to-end Deep Learning classification service:
-- **Model Training**: Trained on the canonical MNIST dataset (60,000 training images, 10,000 test images) achieving >99% test accuracy.
-- **Model Formats**: Saved in modern native Keras 3 format (`.keras`) and converted to mobile-ready TensorFlow Lite (`.tflite`).
-- **REST API**: Built with Flask, providing health monitoring, input validation (dimensions, types, NaN checks), auto-normalization, and sub-10ms CPU inference latency.
-- **Cloud-Ready**: Configured with WSGI Gunicorn server, dynamic PORT binding (`0.0.0.0:$PORT`), `.python-version`, and Render Blueprint configuration (`render.yaml`).
+- **Trained CNN Deep Learning Model**: High-performing CNN reaching **98.97% test accuracy** on the canonical MNIST dataset (70,000 images).
+- **Interactive Drawing Studio**: 280×280 pixel canvas with full mouse and touchscreen support, smooth anti-aliased strokes, and one-click clear.
+- **Smart Preprocessing Pipeline**: Automatically detects stroke bounding boxes, scales preserving aspect ratio into a 20×20 box, centers within a 28×28 frame, inverts background to black, and normalizes pixels to `[0.0, 1.0]`.
+- **Live "AI Vision" Preview**: Displays the exact 28×28 preprocessed image seen by the neural network in real time.
+- **Instant Confidence & Prediction**: Bold typography displaying the predicted digit, confidence percentage, classification quality badge, and CPU inference latency (<15 ms).
+- **10-Class Probability Visualization**: Animated Chart.js bar chart for all ten digits (0–9) highlighting the top prediction in electric violet/purple, with an accessible CSS fallback.
+- **Test Sample Gallery**: Pre-loaded authentic MNIST test samples for digits 0 through 9, allowing one-click verification without drawing.
+- **Live Health & Status Polling**: Asynchronously monitors the `/health` endpoint to display online status and network latency.
+- **Cloud-Ready Deployment**: Configured with `render.yaml`, `Procfile`, Gunicorn WSGI server, and environment variables for seamless deployment on Render.
 
 ---
 
 ## Technology Stack
 
-| Component | Technology | Version | Purpose |
+| Layer | Technology | Version | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Language** | Python | 3.13.4 | Core runtime |
-| **Deep Learning Framework** | TensorFlow & Keras 3 | 2.21.0 / 3.14.1 | CNN model architecture, training, and execution |
-| **Model Formats** | Keras (`.keras`) & TFLite (`.tflite`) | Native Keras 3 / TFLite | Server and edge inference deployment |
-| **API Framework** | Flask | 3.1.2 | RESTful HTTP API routing and request handling |
-| **CORS Middleware** | Flask-CORS | 6.0.2 | Cross-Origin Resource Sharing for frontends |
-| **WSGI Server** | Gunicorn | 26.0.0 | Production-grade HTTP application server |
-| **Numerical Processing** | NumPy | 2.5.1 | Array reshaping, validation, and normalization |
-| **HTTP Client Testing** | Requests | 2.34.2 | Automated integration and regression test suite |
-| **Cloud Hosting** | Render | Cloud PaaS | Continuous build & deployment from GitHub |
+| **Frontend UI** | HTML5, Modern CSS3 | Semantic / Responsive | Responsive layout, light theme with electric blue & purple accents |
+| **Frontend Scripting** | Vanilla JavaScript (ES6+) | Modern Web APIs | Canvas drawing engine, coordinate mapping, touch events, API fetch |
+| **Data Visualization** | Chart.js | 4.x (CDN) | Animated 10-class Softmax probability distribution bar chart |
+| **Backend Framework** | Flask | 3.1.2 | Routing, template rendering, and REST API controllers |
+| **CORS Middleware** | Flask-CORS | 6.0.2 | Cross-Origin Resource Sharing |
+| **Deep Learning** | TensorFlow / Keras 3 | 2.21.0 / 3.14.1 | CNN model architecture, weights loading, execution |
+| **Image Processing** | Pillow (PIL) | 12.2.0 | Base64 decoding, format conversions, image resizing |
+| **Numerical Computing** | NumPy | 2.5.1 | High-performance array reshaping, validation, and math |
+| **WSGI Server** | Gunicorn | 26.0.0 | Production-grade multi-threaded WSGI HTTP server |
+| **Language Runtime** | Python | 3.13.4 | Core programming language |
+| **Hosting Platform** | Render | PaaS | Automated Git-driven deployment and health monitoring |
 
 ---
 
-## CNN Architecture & Performance
+## Interactive Frontend Highlights
 
-The neural network is a sequential Convolutional Neural Network tailored for 28×28 single-channel grayscale inputs:
+### 1. Navigation Bar
+- **Brand Identity**: `MNIST AI` logo with a gradient neural net icon and deep learning badge.
+- **Section Anchors**: Smooth-scrolling links to *Home*, *Drawing Studio*, *Sample Testing*, *How It Works*, and *About Model*.
+- **Live API Status Badge**: Color-coded pill (`API Online` / `API Offline`) that polls `/health` with ping latency indicators.
+
+### 2. Hero Section
+- High-impact typography: *"Turn Your Handwriting Into AI Predictions"*.
+- Subtitle and call-to-action buttons (*"Start Recognition"* & *"Test MNIST Samples"*).
+- Key performance metrics grid: **98.97% Accuracy**, **< 15 ms Latency**, **515K Parameters**, **10 Output Classes**.
+
+### 3. Digit Drawing Studio
+- **280×280 Canvas**: Clean white background with smooth black ink strokes.
+- **Cross-Platform Input**: Full mouse event handling (`mousedown`, `mousemove`, `mouseup`) and mobile/tablet touch handling (`touchstart`, `touchmove`, `touchend`) with scroll-locking on canvas.
+- **Controls**: *Predict Digit* (primary gradient button with loading state) and *Clear Canvas*.
+- **28×28 AI Vision Preview**: Small real-time preview showing how the canvas image was centered and inverted for the neural network.
+
+### 4. Prediction Results & Probabilities
+- **Large Predicted Digit Display**: Eye-catching typography with pop-in animations.
+- **Metrics Badges**: Confidence score (e.g., `99.98%`), classification status (*High Confidence Match*), and inference time.
+- **Softmax Bar Chart**: Dynamic bar chart showcasing probability percentages across classes 0–9.
+
+### 5. Sample Testing Gallery
+- 10 interactive cards showcasing handwritten digits 0 through 9 from the official MNIST test set.
+- Clicking any digit instantly loads it into the canvas, generates the preprocessed view, and triggers prediction.
+
+### 6. Model Architecture & Specifications
+- Comprehensive technical card detailing the optimizer (Adam), loss function, activations (ReLU & Softmax), and dataset split.
+- Step-by-step visual diagram of the convolutional layers, pooling, flattening, and dense classifier.
+
+---
+
+## Smart Image Preprocessing Pipeline
+
+Trained MNIST models require images with **black backgrounds (0.0)**, **white strokes (1.0)**, and digits **centered in a 20×20 box within a 28×28 matrix**.
+
+The frontend and backend collaborate through a 4-step pipeline:
 
 ```
-Input: (28, 28, 1)
+[User draws on 280×280 Canvas (White BG, Black Stroke)]
+                      │
+                      ▼
+[Step 1: Bounding Box Detection]
+  Scans pixel intensity (255 - grayscale) to find min/max X and Y coordinates.
+                      │
+                      ▼
+[Step 2: Aspect-Ratio Preserving Scaling]
+  Fits the extracted stroke bounding box into a 20×20 pixel region.
+                      │
+                      ▼
+[Step 3: Centering & Inversion in 28×28 Canvas]
+  Places the 20×20 digit at the geometric center of a 28×28 black canvas.
+  Inverts pixel intensity: Canvas White (255) -> 0.0, Black Stroke (0) -> 1.0.
+                      │
+                      ▼
+[Step 4: Inference Execution]
+  Tensor shaped to (1, 28, 28, 1), passed to CNN model(img, training=False).
+```
+
+---
+
+## CNN Architecture & Specifications
+
+The CNN was trained on 60,000 MNIST training samples with Adam optimizer for 5 epochs:
+
+```
+Input Layer: (None, 28, 28, 1)
   │
-  ├── Conv2D(32 filters, 3×3 kernel, ReLU)       ──> Output: (26, 26, 32)   [320 params]
-  ├── MaxPooling2D(pool_size 2×2)                 ──> Output: (13, 13, 32)   [0 params]
-  ├── Conv2D(64 filters, 3×3 kernel, ReLU)       ──> Output: (11, 11, 64)   [18,496 params]
-  ├── Flatten()                                  ──> Output: (7744)         [0 params]
-  ├── Dense(64 units, ReLU)                      ──> Output: (64)           [495,680 params]
-  └── Dense(10 units, Softmax)                   ──> Output: (10)           [650 params]
+  ├── Conv2D(32 filters, 3×3 kernel, ReLU)       ──> (None, 26, 26, 32)   [320 params]
+  ├── MaxPooling2D(pool_size 2×2)                 ──> (None, 13, 13, 32)   [0 params]
+  ├── Conv2D(64 filters, 3×3 kernel, ReLU)       ──> (None, 11, 11, 64)   [18,496 params]
+  ├── Flatten()                                  ──> (None, 7744)         [0 params]
+  ├── Dense(64 units, ReLU)                      ──> (None, 64)           [495,680 params]
+  └── Dense(10 units, Softmax)                   ──> (None, 10)           [650 params]
 ```
 
-### Model Metrics
-- **Total Parameters**: 1,545,440 (5.90 MB)
+### Performance Metrics
 - **Trainable Parameters**: 515,146 (1.97 MB)
-- **Keras Model File Size (`mnist_cnn.keras`)**: ~6.2 MB
-- **TFLite Model File Size (`mnist_cnn.tflite`)**: ~2.06 MB (65% compression)
-- **Evaluation Accuracy**: ~99.1% on MNIST unseen test dataset
-- **Inference Latency**: ~6–9 ms per digit on standard CPU
+- **Keras 3 Model Artifact**: `saved_model/mnist_cnn.keras` (~6.2 MB)
+- **TensorFlow Lite Artifact**: `saved_model/mnist_cnn.tflite` (~2.06 MB)
+- **Test Set Loss**: 0.0348
+- **Test Set Accuracy**: 98.97%
+- **Inference Latency**: 8–15 ms on CPU
 
 ---
 
@@ -73,21 +150,31 @@ Input: (28, 28, 1)
 
 ```
 DL Lab/
-│
 ├── saved_model/
-│   ├── mnist_cnn.keras        # Trained Keras 3 CNN model (loaded by Flask API)
-│   └── mnist_cnn.tflite       # Optimized TensorFlow Lite export
+│   ├── mnist_cnn.keras        # Trained Keras 3 CNN model (primary)
+│   └── mnist_cnn.tflite       # Optimized TensorFlow Lite model
 │
-├── app.py                     # Production Flask REST API backend
-├── test_api.py                # Automated end-to-end API test suite (Python requests)
-├── mnist_training.ipynb       # Jupyter notebook with training & TFLite conversion pipeline
+├── templates/
+│   └── index.html             # Modern HTML5 AI Dashboard
 │
-├── requirements.txt           # Python dependencies pinned for cloud deployment
-├── .python-version            # Specifies Python 3.13.4 runtime for Render
-├── Procfile                   # Cloud process execution command for Gunicorn
-├── render.yaml                # Render Blueprint infrastructure specification
-├── .gitignore                 # Excludes cache/venv while preserving saved_model/
-└── README.md                  # Complete documentation and deployment guide
+├── static/
+│   ├── css/
+│   │   └── style.css          # Responsive design, light theme, CSS variables
+│   └── js/
+│       ├── app.js             # Canvas engine, preprocessing, API client
+│       └── samples.js         # Verified MNIST test samples (digits 0–9)
+│
+├── app.py                     # Flask REST API + Frontend Server
+├── test_api.py                # Automated end-to-end test suite
+├── mnist_samples.json         # Raw extracted sample matrices
+├── mnist_training.ipynb       # Jupyter notebook with training pipeline
+│
+├── requirements.txt           # Pinned production dependencies
+├── .python-version            # Python 3.13.4 specification for Render
+├── Procfile                   # Process command for Gunicorn
+├── render.yaml                # Infrastructure configuration for Render
+├── .gitignore                 # Version control exclusions
+└── README.md                  # Project documentation
 ```
 
 ---
@@ -95,21 +182,22 @@ DL Lab/
 ## Local Installation & Setup
 
 ### 1. Prerequisites
-- Python 3.13 (or 3.11 / 3.12)
-- Git
+- **Python 3.11, 3.12, or 3.13** installed
+- **Git** installed
 
-### 2. Clone or Navigate to the Project
+### 2. Clone the Repository
 ```bash
-cd "C:\Users\ADMIN\Desktop\DL Lab"
+git clone https://github.com/Pavanatechy/MNIST-CNN.git
+cd MNIST-CNN
 ```
 
-### 3. Create and Activate Virtual Environment (Optional but Recommended)
+### 3. Create and Activate Virtual Environment
 ```bash
-# Windows (PowerShell)
+# Windows
 python -m venv venv
-.\venv\Scripts\Activate.ps1
+.\venv\Scripts\activate
 
-# Linux / macOS
+# macOS / Linux
 python3 -m venv venv
 source venv/bin/activate
 ```
@@ -121,302 +209,171 @@ pip install -r requirements.txt
 
 ---
 
-## Running the Application Locally
+## Running Locally
 
-### Development Server (Flask)
+Start the local Flask development server:
+
 ```bash
 python app.py
 ```
-By default, the server will load `saved_model/mnist_cnn.keras`, perform a warmup pass, and listen at:
+
+Output:
 ```
-http://127.0.0.1:5000
+Loading MNIST CNN model from: D:\DL Lab\saved_model\mnist_cnn.keras
+Model loaded successfully into memory.
+Model warmup complete. API is ready to serve requests.
+Starting Flask server on http://0.0.0.0:5000 (debug=False)
+ * Running on http://127.0.0.1:5000
 ```
 
-### Production Server (Gunicorn — Linux / macOS / WSL)
-```bash
-gunicorn app:app --bind 0.0.0.0:5000 --workers 1 --threads 4 --timeout 120
-```
-
-> **Note on Windows**: Gunicorn relies on POSIX system calls (`fcntl`/`fork`). On local Windows, use `python app.py`. In Render's Linux environment, Gunicorn runs natively as specified in `Procfile` and `render.yaml`.
+Open **`http://127.0.0.1:5000`** in any web browser to interact with the dashboard.
 
 ---
 
-## API Endpoints & Specifications
+## Automated Testing Suite
 
-### 1. Root Endpoint: `GET /`
-Provides service status, model metadata, and route documentation.
-
-**Request:**
-```bash
-curl -X GET http://127.0.0.1:5000/
-```
-
-**Response (`200 OK`):**
-```json
-{
-  "name": "MNIST Handwritten Digit Recognition API",
-  "status": "online",
-  "version": "1.0.0",
-  "framework": "TensorFlow / Keras 3",
-  "model": "CNN (mnist_cnn.keras)",
-  "endpoints": {
-    "GET /": "API root status and information",
-    "GET /health": "Health check and model status",
-    "POST /predict": "Predict handwritten digit from 28x28 image JSON"
-  },
-  "input_specification": {
-    "endpoint": "/predict",
-    "method": "POST",
-    "content_type": "application/json",
-    "body_schema": {
-      "image": "28x28 2D list of pixel values (0-255 or 0.0-1.0) or 784-element 1D list"
-    }
-  }
-}
-```
-
----
-
-### 2. Health Check: `GET /health`
-Liveness and readiness probe for cloud monitoring.
-
-**Request:**
-```bash
-curl -X GET http://127.0.0.1:5000/health
-```
-
-**Response (`200 OK`):**
-```json
-{
-  "status": "ok",
-  "model": "mnist_cnn",
-  "model_loaded": true,
-  "framework": "TensorFlow / Keras 3"
-}
-```
-
----
-
-### 3. Prediction Endpoint: `POST /predict`
-Performs digit classification on an input image.
-
-- **Content-Type**: `application/json`
-- **Body Schema**: `{"image": [...]}` where `image` is a 28×28 2D array or 784-element 1D array.
-- **Normalization**: Pixel values in the 0–255 range are automatically converted to 0.0–1.0.
-
-**Sample Request (Python):**
-```python
-import requests
-
-payload = {
-    "image": [[0.0] * 28 for _ in range(28)]  # Replace with actual 28x28 pixel values
-}
-response = requests.post("http://127.0.0.1:5000/predict", json=payload)
-print(response.json())
-```
-
-**Sample Response (`200 OK`):**
-```json
-{
-  "prediction": 7,
-  "confidence": 1.0,
-  "all_probs": [
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    1.0,
-    0.0,
-    0.0
-  ],
-  "inference_ms": 7.42
-}
-```
-
-### Error Responses
-The API implements structured JSON error handling:
-- **`400 Bad Request`**: Sent if `Content-Type` is not `application/json`, the `image` key is missing, dimensions differ from 784 pixels, or values contain NaN/Infinity.
-  ```json
-  {
-    "error": "Bad Request",
-    "message": "Invalid image dimensions. Expected 28x28 (784 pixels), but received array with size 100 and shape [10, 10]."
-  }
-  ```
-- **`404 Not Found`**: Sent if an unmapped route is requested.
-  ```json
-  {
-    "error": "Not Found",
-    "message": "The requested URL was not found on this server.",
-    "available_endpoints": ["GET /", "GET /health", "POST /predict"]
-  }
-  ```
-
----
-
-## Automated API Testing
-
-The project includes `test_api.py`, which validates the full request/response lifecycle using Python `requests` and a real test sample from MNIST:
+The repository includes a comprehensive automated test suite verifying all endpoints, frontend rendering, model predictions, and error handling:
 
 ```bash
-# Make sure your app is running in one terminal (python app.py)
-# Then run the test suite in another terminal:
 python test_api.py
 ```
 
-To test against a remote cloud URL (such as your deployed Render app):
-```bash
-python test_api.py https://your-app-name.onrender.com
-```
-
-### Test Suite Execution Output
+### Test Suite Output
 ```
 =================================================================
- MNIST API Test Suite - Target: http://127.0.0.1:5000
+ MNIST AI - Service Test Suite (Target: http://127.0.0.1:5000)
 =================================================================
 
-[1/3] Testing GET / ...
+[1/5] Testing GET / (Frontend Dashboard) ...
    Status Code: 200
-✅ GET / test passed successfully!
+✅ GET / (Frontend) test passed successfully!
 
-[2/3] Testing GET /health ...
+[2/5] Testing GET /?format=json & GET /api (API Metadata) ...
    Status Code: 200
+✅ GET /api metadata test passed successfully!
+
+[3/5] Testing GET /health ...
+   Status Code: 200
+   Response Body:
+{
+  "framework": "TensorFlow / Keras 3",
+  "model": "mnist_cnn",
+  "model_loaded": true,
+  "status": "ok"
+}
 ✅ GET /health test passed successfully!
 
-[3/3] Testing POST /predict with real MNIST test sample ...
+[4/5] Testing POST /predict with 28x28 matrix sample ...
    Loaded sample #0 from MNIST test set (Ground Truth Label: 7)
    Status Code: 200
    Ground Truth Label:  7
    Predicted Digit:     7
    Confidence Score:    100.00%
-   Server Inference:    9.04 ms
-   Total Roundtrip:     22.82 ms
-   🎯 Prediction matches ground truth digit 7!
+   Server Inference:    21.78 ms
+   🎯 Prediction accurately matches ground truth digit 7!
+✅ POST /predict (matrix) test passed successfully!
 
-[Optional] Testing error handling for invalid 10x10 image ...
-   Invalid payload status code: 400
-✅ Error handling test passed!
+[5/5] Testing error handling on invalid payloads ...
+   Invalid dimensions status code: 400
+✅ Error handling tests passed successfully!
 
-✅ POST /predict test passed successfully!
 =================================================================
- 🎉 ALL API TESTS COMPLETED AND VERIFIED SUCCESSFULLY!
+ 🎉 ALL API & FRONTEND TESTS PASSED SUCCESSFULLY!
 =================================================================
 ```
 
 ---
 
-## GitHub Configuration & Upload Instructions
+## REST API Documentation
 
-Follow these exact steps to push this project to GitHub. **(Do not push without verifying your repository details)**:
+### 1. `GET /`
+- **Default**: Serves the modern HTML5 frontend dashboard.
+- **With `Accept: application/json` or `?format=json`**: Returns API specification and route index.
 
-### Step 1: Initialize Git Repository
-In your project directory (`C:\Users\ADMIN\Desktop\DL Lab`):
-```bash
-git init
+### 2. `GET /health`
+Returns service and model availability status:
+```json
+{
+  "framework": "TensorFlow / Keras 3",
+  "model": "mnist_cnn",
+  "model_loaded": true,
+  "status": "ok"
+}
 ```
 
-### Step 2: Stage Project Files
-```bash
-git add .
-```
-Verify the staged files:
-```bash
-git status
-```
-> Notice that `saved_model/mnist_cnn.keras` (~6.2 MB) and `saved_model/mnist_cnn.tflite` (~2.06 MB) are properly staged, while virtual environments and caches are excluded by `.gitignore`.
+### 3. `POST /predict`
+Performs digit inference on an input image.
 
-### Step 3: Create Initial Commit
-```bash
-git commit -m "feat: complete MNIST CNN Flask API ready for Render cloud deployment"
-```
+**Request Formats Supported:**
+- **2D Numeric Matrix**: 28×28 list of floats `[0.0, 1.0]` or ints `[0, 255]`.
+- **1D Numeric Array**: 784-element list of pixel values.
+- **Base64 Encoded Image**: `data:image/png;base64,...` or raw base64 string.
 
-### Step 4: Create a New GitHub Repository
-1. Go to [GitHub New Repository](https://github.com/new).
-2. Set Repository name to `mnist-digit-recognition-api` (or your preferred name).
-3. Set visibility to **Public** (recommended for free Render deployment).
-4. Leave "Add a README", ".gitignore", and "License" **unchecked** (we already have them).
-5. Click **Create repository**.
-
-### Step 5: Link Remote and Push
-```bash
-git branch -M main
-git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/mnist-digit-recognition-api.git
-git push -u origin main
+**Example Request:**
+```json
+{
+  "image": [[0.0, 0.0, ...], ...]
+}
 ```
 
-*(Alternatively, if you use the GitHub CLI `gh` already installed on your machine):*
-```bash
-gh repo create mnist-digit-recognition-api --public --source=. --remote=origin --push
+**Example Response:**
+```json
+{
+  "prediction": 7,
+  "confidence": 0.9998,
+  "all_probs": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.9998, 0.0, 0.0002],
+  "inference_ms": 9.42
+}
 ```
+
+### 4. `GET /api/samples`
+Returns 10 authentic handwritten sample digits (0–9) from the MNIST test set.
 
 ---
 
 ## Render Cloud Deployment Guide
 
-Render will build and serve your API directly from your GitHub repository.
+This project is pre-configured for automated zero-downtime deployment on Render:
 
-### Step 1: Create a Render Account
-1. Visit [https://render.com](https://render.com) and sign up (or sign in with your GitHub account).
-
-### Step 2: Create a New Web Service
-1. In the Render Dashboard, click **New +** in the top navigation bar.
-2. Select **Web Service**.
-3. Choose **Build and deploy from a Git repository**.
-4. Connect your GitHub account and select your `mnist-digit-recognition-api` repository.
-
-### Step 3: Configure Service Settings
-Fill in the following fields in the Render dashboard:
-
-| Setting | Value | Explanation |
-| :--- | :--- | :--- |
-| **Name** | `mnist-digit-recognition-api` | Your unique service name |
-| **Region** | `Oregon (US West)` or nearest | Cloud region |
-| **Branch** | `main` | Git deployment branch |
-| **Root Directory** | *(leave blank)* | Root of the repo |
-| **Runtime** | `Python 3` | Python runtime |
-| **Build Command** | `pip install -r requirements.txt` | Installs dependencies |
-| **Start Command** | `gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120` | Production WSGI command |
-| **Instance Type** | `Free` | Free tier (512 MB RAM) |
-
-### Step 4: Configure Environment Variables (Optional but Recommended)
-Under **Environment Variables**, add:
-- `PYTHON_VERSION`: `3.13.4`
-- `TF_ENABLE_ONEDNN_OPTS`: `0`
-
-*(If you use Render Blueprints, Render will automatically detect and apply `render.yaml` with these exact settings).*
-
-### Step 5: Deploy the Service
-1. Click **Create Web Service**.
-2. Render will trigger the initial build:
-   - Clones your repository.
-   - Installs Python 3.13.
-   - Runs `pip install -r requirements.txt`.
-   - Starts the application using Gunicorn.
-3. Once the build completes, the logs will show:
-   ```
-   ==> Starting service with 'gunicorn app:app --bind 0.0.0.0:$PORT ...'
-   Loading MNIST CNN model from: .../saved_model/mnist_cnn.keras
-   Model loaded successfully into memory.
-   Model warmup complete. API is ready to serve requests.
-   ==> Your service is live 🎉
+1. **Push to GitHub**:
+   Ensure your latest code is pushed to your GitHub repository:
+   ```bash
+   git add .
+   git commit -m "Deploy modern interactive frontend and backend"
+   git push origin main
    ```
 
-### Step 6: Test Your Public Render URL
-Your public service URL will be displayed at the top of the Render dashboard:
-```
-https://mnist-digit-recognition-api-xxxx.onrender.com
-```
+2. **Create New Web Service on Render**:
+   - Go to [dashboard.render.com](https://dashboard.render.com/).
+   - Click **New +** -> **Web Service**.
+   - Connect your repository (`https://github.com/Pavanatechy/MNIST-CNN.git`).
 
-Test it immediately using `test_api.py`:
+3. **Configure Settings**:
+   - **Environment**: `Python`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120`
+   - **Environment Variables**:
+     - `PYTHON_VERSION`: `3.13.4`
+     - `TF_ENABLE_ONEDNN_OPTS`: `0`
+
+4. **Deploy**:
+   Click **Create Web Service**. Render will build the environment, load the CNN model, and serve both the web dashboard and REST API live!
+
+---
+
+## Git Version Control & Repository
+
+Repository: [https://github.com/Pavanatechy/MNIST-CNN.git](https://github.com/Pavanatechy/MNIST-CNN.git)
+
+To push the latest updates:
 ```bash
-python test_api.py https://mnist-digit-recognition-api-xxxx.onrender.com
-```
-Or with `curl`:
-```bash
-curl -X GET https://mnist-digit-recognition-api-xxxx.onrender.com/health
+git add .
+git commit -m "Add modern interactive AI frontend, canvas preprocessing, probability chart, and sample gallery"
+git push origin main
 ```
 
-> **Note on Free Tier Inactivity**: Free Render instances automatically spin down into a sleep state after 15 minutes of inactivity. The first incoming request will take ~30–50 seconds to cold-start the container and load the model into memory. Subsequent requests will execute in milliseconds.
+---
 
+## License
+
+This project is licensed under the MIT License. Built with TensorFlow, Keras 3, and Flask.

@@ -8,6 +8,8 @@ numpy>=1.26.0
 tensorflow>=2.20.0
 keras>=3.0.0
 
+# Image Processing
+Pillow>=10.0.0
+
 # HTTP Client (for automated testing)
 requests>=2.31.0
-

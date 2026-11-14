@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MNIST AI - Handwritten Digit Recognition System</title>
+    <meta name="description" content="Interactive Handwritten Digit Recognition System powered by a TensorFlow/Keras 3 Convolutional Neural Network (CNN) with 98.97% accuracy.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Chart.js for beautiful probability visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="#hero" class="brand-logo">
+                <div class="brand-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">MNIST<span class="gradient-text"> AI</span></span>
+                    <span class="brand-subtitle">CNN Classifier</span>
+                </div>
+            </a>
+
+            <nav class="nav-links">
+                <a href="#hero" class="nav-link active">Home</a>
+                <a href="#studio" class="nav-link">Drawing Studio</a>
+                <a href="#samples" class="nav-link">Sample Testing</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="#model-info" class="nav-link">About Model</a>
+            </nav>
+
+            <div class="nav-actions">
+                <div id="apiStatusBadge" class="api-status-pill checking" title="Connecting to Flask /health endpoint...">
+                    <span class="status-dot"></span>
+                    <span class="status-label">Checking API...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section id="hero" class="hero-section">
+            <div class="hero-content">
+                <div class="badge-pill">
+                    <span class="badge-sparkle">✦</span>
+                    <span>TensorFlow & Keras 3 • 98.97% Accuracy</span>
+                </div>
+                <h1 class="hero-title">
+                    Turn Your Handwriting Into <br>
+                    <span class="gradient-text">AI Predictions</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Draw any digit from 0 to 9 and let our CNN deep learning model recognize it instantly.
+                </p>
+                <div class="hero-actions">
+                    <a href="#studio" class="btn btn-primary btn-lg">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                        Start Recognition
+                    </a>
+                    <a href="#samples" class="btn btn-secondary btn-lg">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        Test MNIST Samples
+                    </a>
+                </div>
+
+                <!-- Hero Key Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-value">98.97%</span>
+                        <span class="metric-label">Test Set Accuracy</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-value">&lt; 15 ms</span>
+                        <span class="metric-label">Inference Latency</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-value">515,146</span>
+                        <span class="metric-label">Trained Parameters</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-value">10 Classes</span>
+                        <span class="metric-label">Digits 0 through 9</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Digit Drawing & Prediction Studio -->
+        <section id="studio" class="studio-section">
+            <div class="section-header">
+                <span class="section-tag">Interactive Canvas</span>
+                <h2 class="section-title">Handwritten Digit Studio</h2>
+                <p class="section-desc">Draw a digit inside the canvas below with your mouse or touchscreen, or pick a sample from the test gallery.</p>
+            </div>
+
+            <div class="studio-grid">
+                <!-- Left Column: Drawing Canvas & Preprocessing -->
+                <div class="card canvas-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                                    <path d="M2 2l7.586 7.586"></path>
+                                    <circle cx="11" cy="11" r="2"></circle>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Drawing Canvas</h3>
+                                <p class="card-subtitle">White canvas with black strokes (280×280)</p>
+                            </div>
+                        </div>
+                        <button id="clearBtn" class="btn btn-ghost btn-sm" title="Clear canvas">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            Clear
+                        </button>
+                    </div>
+
+                    <!-- Interactive Canvas Area -->
+                    <div class="canvas-wrapper">
+                        <canvas id="drawingCanvas" width="280" height="280" class="drawing-canvas"></canvas>
+                        <div id="canvasOverlay" class="canvas-overlay">
+                            <span class="overlay-text">Draw digit 0–9 here</span>
+                        </div>
+                    </div>
+
+                    <!-- Drawing Controls -->
+                    <div class="canvas-controls">
+                        <button id="predictBtn" class="btn btn-primary btn-block">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                            </svg>
+                            <span id="predictBtnText">Predict Digit</span>
+                        </button>
+                    </div>
+
+                    <!-- Preprocessing Pipeline Info & Preview -->
+                    <div class="preprocessing-card">
+                        <div class="pre-info">
+                            <span class="pre-title">Model Input Preprocessing</span>
+                            <span class="pre-desc">Downscaled, inverted & centered to 28×28 grayscale</span>
+                        </div>
+                        <div class="preview-box" title="28x28 normalized MNIST input fed to the CNN model">
+                            <canvas id="previewCanvas" width="28" height="28" class="preview-canvas"></canvas>
+                            <span class="preview-tag">28×28 AI Vision</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Prediction Results & Probabilities -->
+                <div class="card result-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <div class="card-icon accent-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Prediction Result</h3>
+                                <p class="card-subtitle">Real-time deep learning inference</p>
+                            </div>
+                        </div>
+                        <div id="predictionBadge" class="status-pill status-ready">Ready</div>
+                    </div>
+
+                    <!-- Large Prediction Display -->
+                    <div class="prediction-display">
+                        <div class="digit-box">
+                            <span id="predictedDigit" class="digit-value">-</span>
+                            <span class="digit-caption">Predicted Class</span>
+                        </div>
+                        <div class="prediction-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Confidence</span>
+                                <span id="confidenceValue" class="meta-value">-</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Inference Latency</span>
+                                <span id="inferenceValue" class="meta-value">-</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Classification Status</span>
+                                <span id="classificationStatus" class="meta-value text-muted">Awaiting drawing</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Probabilities Chart -->
+                    <div class="probabilities-section">
+                        <div class="prob-header">
+                            <span class="prob-title">Class Probabilities (0 – 9)</span>
+                            <span class="prob-subtitle">Softmax probability distribution</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="probabilityChart"></canvas>
+                            <!-- Accessible Fallback Bar List -->
+                            <div id="fallbackBars" class="fallback-bars" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sample Testing Section -->
+        <section id="samples" class="samples-section">
+            <div class="section-header">
+                <span class="section-tag">Fast Benchmark</span>
+                <h2 class="section-title">Test With MNIST Dataset Samples</h2>
+                <p class="section-desc">Click any digit below to instantly load an authentic handwritten sample from the official MNIST test dataset and run prediction.</p>
+            </div>
+
+            <div class="samples-grid">
+                <!-- Buttons 0 to 9 -->
+                <div class="sample-item" data-digit="0">
+                    <div class="sample-digit">0</div>
+                    <div class="sample-preview"><canvas id="sampleCanvas0" width="28" height="28"></canvas></div>
+                    <button class="btn btn-outline btn-xs" onclick="loadSampleDigit(0)">Test 0</button>
+                </div>
+                <div class="sample-item" data-digit="1">
+                    <div class="sample-digit">1</div>
+                    <div class="sample-preview"><canvas id="sampleCanvas1" width="28" height="28"></canvas></div>
+                    <button class="btn btn-outline btn-xs" onclick="loadSampleDigit(1)">Test 1</button>
+                </div>
+                <div class="sample-item" data-digit="2">
+                    <div class="sample-digit">2</div>
+                    <div class="sample-preview"><canvas id="sampleCanvas2" width="28" height="28"></canvas></div>
+                    <button class="btn btn-outline btn-xs" onclick="loadSampleDigit(2)">Test 2</button>
+                </div>
+                <div class="sample-item" data-digit="3">
+                    <div class="sample-digit">3</div>
+                    <div class="sample-preview"><canvas id="sampleCanvas3" width="28" height="28"></canvas></div>
+                    <button class="btn btn-outline btn-xs" onclick="loadSampleDigit(3)">Test 3</button>
+                </div>
+                <div class="sample-item" data-digit="4">
+                    <div class="sample-digit">4</div>
+                    <div class="sample-preview"><canvas id="sampleCanvas4" width="28" height="28"></canvas></div>
+                    <button class="btn btn-outline btn-xs" onclick="loadSampleDigit(4)">Test 4</button>
+                </div>
+                <div class="sample-item" data-digit="5">
+                    <div class="sample-digit">5</div>
+                    <div class="sample-preview"><canvas id="sampleCanvas5" width="28" height="28"></canvas></div>
+                    <button class="btn btn-outline btn-xs" onclick="loadSampleDigit(5)">Test 5</button>
+                </div>
+                <div class="sample-item" data-digit="6">
+                    <div class="sample-digit">6</div>
+                    <div class="sample-preview"><canvas id="sampleCanvas6" width="28" height="28"></canvas></div>
+                    <button class="btn btn-outline btn-xs" onclick="loadSampleDigit(6)">Test 6</button>
+                </div>
+                <div class="sample-item" data-digit="7">
+                    <div class="sample-digit">7</div>
+                    <div class="sample-preview"><canvas id="sampleCanvas7" width="28" height="28"></canvas></div>
+                    <button class="btn btn-outline btn-xs" onclick="loadSampleDigit(7)">Test 7</button>
+                </div>
+                <div class="sample-item" data-digit="8">
+                    <div class="sample-digit">8</div>
+                    <div class="sample-preview"><canvas id="sampleCanvas8" width="28" height="28"></canvas></div>
+                    <button class="btn btn-outline btn-xs" onclick="loadSampleDigit(8)">Test 8</button>
+                </div>
+                <div class="sample-item" data-digit="9">
+                    <div class="sample-digit">9</div>
+                    <div class="sample-preview"><canvas id="sampleCanvas9" width="28" height="28"></canvas></div>
+                    <button class="btn btn-outline btn-xs" onclick="loadSampleDigit(9)">Test 9</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="how-it-works-section">
+            <div class="section-header">
+                <span class="section-tag">Pipeline</span>
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-desc">From your hand stroke to neural network activation in four transparent steps.</p>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <h3 class="step-title">Interactive Drawing</h3>
+                    <p class="step-text">You draw on a responsive 280×280 HTML5 canvas with a smooth stroke algorithm supporting mouse and touch input.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <h3 class="step-title">MNIST Normalization</h3>
+                    <p class="step-text">The digit bounding box is isolated, centered, and scaled to a 20×20 box within a 28×28 frame, inverted to black background, and normalized to [0, 1].</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <h3 class="step-title">CNN Feature Extraction</h3>
+                    <p class="step-text">Two 2D Convolutional layers (32 & 64 filters) with ReLU activations and MaxPooling detect edges, loops, and spatial handwriting patterns.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">04</div>
+                    <h3 class="step-title">Softmax Probability</h3>
+                    <p class="step-text">The dense classifier outputs 10 probability scores representing digits 0–9. The argmax identifies the prediction in under 15ms.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model Information Section -->
+        <section id="model-info" class="model-info-section">
+            <div class="section-header">
+                <span class="section-tag">Specifications</span>
+                <h2 class="section-title">Model Architecture & Training Details</h2>
+                <p class="section-desc">Technical parameters of the trained TensorFlow/Keras 3 Convolutional Neural Network.</p>
+            </div>
+
+            <div class="specs-grid">
+                <div class="spec-card">
+                    <span class="spec-label">Model Architecture</span>
+                    <span class="spec-value">Convolutional Neural Network (CNN)</span>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-label">Dataset</span>
+                    <span class="spec-value">MNIST (70,000 Grayscale Digits)</span>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-label">Input Dimensions</span>
+                    <span class="spec-value">28 × 28 × 1 (Grayscale)</span>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-label">Output Classes</span>
+                    <span class="spec-value">10 Classes (Digits 0 through 9)</span>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-label">Framework</span>
+                    <span class="spec-value">TensorFlow / Keras 3</span>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-label">Optimizer</span>
+                    <span class="spec-value">Adam (learning_rate = 0.001)</span>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-label">Activation Functions</span>
+                    <span class="spec-value">ReLU (Hidden) & Softmax (Output)</span>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-label">Loss Function</span>
+                    <span class="spec-value">Sparse Categorical Crossentropy</span>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-label">Test Set Accuracy</span>
+                    <span class="spec-value text-accent font-bold">98.97%</span>
+                </div>
+                <div class="spec-card">
+                    <span class="spec-label">Model Artifacts</span>
+                    <span class="spec-value">Keras (.keras) & TFLite (.tflite)</span>
+                </div>
+            </div>
+
+            <!-- Architecture Flow Diagram -->
+            <div class="architecture-card">
+                <h3 class="arch-title">Layer-by-Layer Neural Pipeline</h3>
+                <div class="arch-flow">
+                    <div class="arch-node">
+                        <span class="node-tag">Input</span>
+                        <span class="node-name">28×28×1</span>
+                        <span class="node-detail">Grayscale</span>
+                    </div>
+                    <div class="arch-arrow">→</div>
+                    <div class="arch-node">
+                        <span class="node-tag">Conv2D</span>
+                        <span class="node-name">32 Filters</span>
+                        <span class="node-detail">3×3, ReLU</span>
+                    </div>
+                    <div class="arch-arrow">→</div>
+                    <div class="arch-node">
+                        <span class="node-tag">MaxPool</span>
+                        <span class="node-name">2×2 Pool</span>
+                        <span class="node-detail">Downsample</span>
+                    </div>
+                    <div class="arch-arrow">→</div>
+                    <div class="arch-node">
+                        <span class="node-tag">Conv2D</span>
+                        <span class="node-name">64 Filters</span>
+                        <span class="node-detail">3×3, ReLU</span>
+                    </div>
+                    <div class="arch-arrow">→</div>
+                    <div class="arch-node">
+                        <span class="node-tag">Flatten</span>
+                        <span class="node-name">7,744</span>
+                        <span class="node-detail">1D Vector</span>
+                    </div>
+                    <div class="arch-arrow">→</div>
+                    <div class="arch-node">
+                        <span class="node-tag">Dense</span>
+                        <span class="node-name">64 Units</span>
+                        <span class="node-detail">ReLU</span>
+                    </div>
+                    <div class="arch-arrow">→</div>
+                    <div class="arch-node node-output">
+                        <span class="node-tag">Softmax</span>
+                        <span class="node-name">10 Classes</span>
+                        <span class="node-detail">0 to 9 Probs</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Health & Status Card -->
+        <section class="api-section">
+            <div class="card api-card">
+                <div class="api-info-col">
+                    <div class="api-header">
+                        <span class="section-tag">Backend Service</span>
+                        <h3 class="api-title">Flask REST API Service</h3>
+                    </div>
+                    <p class="api-desc">The frontend communicates asynchronously with the Flask backend via RESTful JSON endpoints.</p>
+                    <div class="api-endpoints-list">
+                        <div class="endpoint-item">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/</span>
+                            <span class="endpoint-desc">Interactive Web Dashboard</span>
+                        </div>
+                        <div class="endpoint-item">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/health</span>
+                            <span class="endpoint-desc">Health Check & Model Status</span>
+                        </div>
+                        <div class="endpoint-item">
+                            <span class="method post">POST</span>
+                            <span class="endpoint-path">/predict</span>
+                            <span class="endpoint-desc">Digit Inference (Array or Base64)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="api-status-col">
+                    <div class="status-box">
+                        <span class="status-box-title">System Status</span>
+                        <div id="fullApiStatus" class="status-state checking">
+                            <span class="status-state-dot"></span>
+                            <span id="fullApiStatusText">Connecting to API...</span>
+                        </div>
+                        <div class="status-details">
+                            <div class="status-row">
+                                <span>Model:</span>
+                                <span id="healthModelName">mnist_cnn.keras</span>
+                            </div>
+                            <div class="status-row">
+                                <span>Framework:</span>
+                                <span id="healthFramework">TensorFlow / Keras 3</span>
+                            </div>
+                            <div class="status-row">
+                                <span>Latency:</span>
+                                <span id="healthPing">-</span>
+                            </div>
+                        </div>
+                        <button id="refreshHealthBtn" class="btn btn-secondary btn-sm btn-block">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <polyline points="1 20 1 14 7 14"></polyline>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                            </svg>
+                            Refresh Health Status
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <div class="footer-logo">
+                    <span class="brand-title">MNIST<span class="gradient-text"> AI</span></span>
+                </div>
+                <p class="footer-tagline">MNIST AI - Deep Learning Project</p>
+                <p class="footer-tech">Built using TensorFlow, CNN and Flask.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#hero">Home</a>
+                <a href="#studio">Drawing Studio</a>
+                <a href="#samples">Samples</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#model-info">About Model</a>
+                <a href="https://github.com/Pavanatechy/MNIST-CNN.git" target="_blank" rel="noopener">GitHub Repository</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 MNIST AI • Handwritten Digit Recognition System. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <!-- Toast Notification for Alerts -->
+    <div id="toastNotification" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/samples.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
