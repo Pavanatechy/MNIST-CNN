@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: mnist-digit-recognition-api
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.4
+      - key: TF_ENABLE_ONEDNN_OPTS
+        value: "0"
+

@@ -1,0 +1,13 @@
+# Flask & Web Server
+Flask>=3.0.0,<4.0.0
+flask-cors>=4.0.0
+gunicorn>=21.2.0
+
+# Numerical & Deep Learning
+numpy>=1.26.0
+tensorflow>=2.20.0
+keras>=3.0.0
+
+# HTTP Client (for automated testing)
+requests>=2.31.0
+
